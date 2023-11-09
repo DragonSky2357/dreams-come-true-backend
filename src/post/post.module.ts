@@ -13,12 +13,13 @@ import { HttpModule } from '@nestjs/axios';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Post, User, Comment, Tag]),
-    OpenAIModule.registerAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        apiKey: config.get<string>('OPENAI_API_KEY'),
-      }),
-    }),
+
+    // OpenAIModule.registerAsync({
+    //   inject: [ConfigService],
+    //   useFactory: (config: ConfigService) => ({
+    //     apiKey: config.get<string>('OPENAI_API_KEY'),
+    //   }),
+    // }),
     HttpModule,
   ],
   controllers: [PostController],

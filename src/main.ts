@@ -2,11 +2,17 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import * as fs from 'fs';
 
 declare const module: any;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./secrets/cert.key'),
+    cert: fs.readFileSync('./secrets/cert.crt'),
+  };
+
+  const app = await NestFactory.create(AppModule, { httpsOptions });
   app.setGlobalPrefix('/api');
   app.enableCors({
     origin: true,

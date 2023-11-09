@@ -7,7 +7,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entity/post.entity';
 import { Repository } from 'typeorm';
-import { OpenAIClient } from '@platohq/nestjs-openai';
+import OpenAI from 'openai';
 import Translator from 'papago';
 import { User } from '../user/entity/user.entity';
 import { HttpService } from '@nestjs/axios';
@@ -20,6 +20,7 @@ import { UpdatePostDto } from './dto/update-post-dto';
 
 @Injectable()
 export class PostService {
+  private readonly openaiClient;
   constructor(
     @InjectRepository(Post) private postRepository: Repository<Post>,
     @InjectRepository(User) private userRepository: Repository<User>,
@@ -28,7 +29,6 @@ export class PostService {
     @InjectRepository(Comment)
     private readonly commentRepository: Repository<Comment>,
     private readonly httpService: HttpService,
-    private readonly openAIClient: OpenAIClient,
   ) {}
 
   async getAllPost(): Promise<Post[]> {
@@ -236,13 +236,18 @@ export class PostService {
         await this.translateWithPapago(title),
       ).concat(', digital art');
 
-      const createImage = await this.openAIClient.createImage({
+      const openai = new OpenAI({
+        apiKey: process.env['OPENAI_API_KEY'], // defaults to process.env["OPENAI_API_KEY"]
+      });
+
+      const createImage = await openai.images.generate({
+        model: 'dall-e-3',
         prompt: translateText,
         n: 1,
         size: '1024x1024',
       });
 
-      const createImageUrl: string = createImage.data.data[0].url;
+      const createImageUrl: string = createImage.data[0].url;
       const resultImageUrl = await this.uploadImage(createImageUrl);
 
       return {

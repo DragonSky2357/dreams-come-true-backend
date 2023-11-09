@@ -44,7 +44,7 @@
     "nest-winston": "^1.9.1",
     "nodemailer": "^6.9.1",
     "npm": "^9.6.4",
-    "openai": "^3.2.1",
+    "openai": "^4.17.0",
     "papago": "^1.1.1",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
