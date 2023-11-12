@@ -17,6 +17,7 @@ import { CreateCommentDto } from './dto/create-comment.dto';
 import { Tag } from './../shared/entities/tag.entity';
 import { Comment } from './../shared/entities/comment.entity';
 import { UpdatePostDto } from './dto/update-post-dto';
+import axios from 'axios';
 
 @Injectable()
 export class PostService {
@@ -259,13 +260,23 @@ export class PostService {
   }
 
   async translateWithPapago(text: string): Promise<string> {
-    const translator = new Translator(
-      process.env.PAPAGO_ID,
-      process.env.PAPAGO_SECRET,
+    const response = await axios.post(
+      'https://naveropenapi.apigw.ntruss.com/nmt/v1/translation',
+      {
+        source: 'ko',
+        target: 'en',
+        text,
+      },
+      {
+        headers: {
+          'X-NCP-APIGW-API-KEY-ID': process.env.PAPAGO_ID,
+          'X-NCP-APIGW-API-KEY': process.env.PAPAGO_SECRET,
+        },
+      },
     );
-    const result = await translator.translate(text, 'ko', 'en');
 
-    return result.text;
+    const translateText = response.data['message']['result']['translatedText'];
+    return translateText;
   }
 
   async uploadImage(createImageUrl: string): Promise<string> {
